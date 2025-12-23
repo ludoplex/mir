@@ -439,3 +439,9 @@ The executable is "configurable" with environment variables:
   * Currently MIR works on x86_64, aarch64, ppc64le, s390x, riscv64 Linux and x86_64/aarch64 (Apple M1) MacOS
   * [HOW-TO-PORT-MIR.md](https://github.com/vnmakarov/mir/blob/master/HOW-TO-PORT-MIR.md) outlines process of porting MIR
     * On my estimation an experienced developer can port MIR (including `c2m`) to another target for 1-2 months
+
+## Cosmopolitan Libc Support
+  * MIR can be built with [Cosmopolitan Libc](https://github.com/jart/cosmopolitan) to create
+    **fat binaries** that run on multiple operating systems (Linux, macOS, Windows, FreeBSD, etc.)
+  * See [COSMOPOLITAN.md](COSMOPOLITAN.md) for build instructions
+  * Use `make -f GNUmakefile.cosmo` to build with the Cosmopolitan toolchain

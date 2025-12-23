@@ -1,0 +1,160 @@
+# Cosmopolitan Libc build file for MIR
+# This Makefile allows building MIR with Cosmopolitan's cosmocc toolchain
+# to create fat binaries that run on multiple OSes and architectures.
+#
+# Prerequisites:
+#   - Download and install cosmocc from https://cosmo.zip/pub/cosmocc/
+#   - Ensure cosmocc is in your PATH
+#
+# Usage:
+#   make -f GNUmakefile.cosmo [target]
+#
+# Targets:
+#   all      - Build c2m and mir-bin-run as fat binaries
+#   c2m      - Build the C to MIR compiler
+#   mir-run  - Build the MIR binary runner
+#   clean    - Remove build artifacts
+#   test     - Run basic tests
+
+PREFIX ?= /usr/local
+SRC_DIR ?= .
+BUILD_DIR ?= build-cosmo
+
+# Cosmopolitan toolchain
+CC = cosmocc
+AR = cosmoar
+
+# Base compiler flags
+CFLAGS = -fPIC -g -std=gnu11 -Wno-abi -fsigned-char
+CFLAGS += -O3 -DNDEBUG
+CFLAGS += -I$(SRC_DIR)
+
+# Cosmopolitan-specific flags
+CFLAGS += -DMIR_COSMO=1
+
+# Link flags
+LDFLAGS =
+LDLIBS = -lm
+
+# Version info
+API_VERSION = 1
+MAJOR_VERSION = 0
+MINOR_VERSION = 1
+
+# Detect git commit if available
+GITCOMMIT := $(shell cd $(SRC_DIR) && git log -1 --pretty='%H' 2>/dev/null || echo "unknown")
+CFLAGS += -DGITCOMMIT=$(GITCOMMIT)
+
+# Object suffix
+OBJSUFF = o
+LIBSUFF = a
+
+# Executables (Cosmopolitan produces extension-less fat binaries)
+EXE =
+
+# Source files
+MIR_SRC = $(SRC_DIR)/mir.c $(SRC_DIR)/mir-gen.c
+C2M_SRC = $(SRC_DIR)/c2mir/c2mir.c $(SRC_DIR)/c2mir/c2mir-driver.c
+MIR_RUN_SRC = $(SRC_DIR)/mir-bin-run.c
+M2B_SRC = $(SRC_DIR)/mir-utils/m2b.c
+B2M_SRC = $(SRC_DIR)/mir-utils/b2m.c
+B2CTAB_SRC = $(SRC_DIR)/mir-utils/b2ctab.c
+
+# Build objects
+MIR_BUILD = $(MIR_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.$(OBJSUFF))
+C2M_BUILD = $(C2M_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.$(OBJSUFF))
+MIR_RUN_BUILD = $(MIR_RUN_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.$(OBJSUFF))
+M2B_BUILD = $(M2B_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.$(OBJSUFF))
+B2M_BUILD = $(B2M_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.$(OBJSUFF))
+B2CTAB_BUILD = $(B2CTAB_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.$(OBJSUFF))
+
+# Primary executables
+EXECUTABLES = $(BUILD_DIR)/c2m$(EXE) $(BUILD_DIR)/mir-bin-run$(EXE) \
+              $(BUILD_DIR)/m2b$(EXE) $(BUILD_DIR)/b2m$(EXE) $(BUILD_DIR)/b2ctab$(EXE)
+
+# Phony targets
+.PHONY: all clean test c2m mir-run lib check-cosmocc
+
+# Default target
+all: check-cosmocc $(BUILD_DIR)/libmir.$(LIBSUFF) $(EXECUTABLES)
+
+# Check for cosmocc availability
+check-cosmocc:
+	@command -v cosmocc >/dev/null 2>&1 || { \
+		echo "Error: cosmocc not found in PATH."; \
+		echo "Please install Cosmopolitan toolchain from https://cosmo.zip/pub/cosmocc/"; \
+		exit 1; \
+	}
+
+# Create build directories
+$(BUILD_DIR):
+	mkdir -p $@
+
+$(BUILD_DIR)/c2mir:
+	mkdir -p $@
+
+$(BUILD_DIR)/mir-utils:
+	mkdir -p $@
+
+# Compile rules
+$(BUILD_DIR)/%.$(OBJSUFF): $(SRC_DIR)/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/c2mir/%.$(OBJSUFF): $(SRC_DIR)/c2mir/%.c | $(BUILD_DIR)/c2mir
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/mir-utils/%.$(OBJSUFF): $(SRC_DIR)/mir-utils/%.c | $(BUILD_DIR)/mir-utils
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Static library
+$(BUILD_DIR)/libmir.$(LIBSUFF): $(BUILD_DIR)/mir.$(OBJSUFF) $(BUILD_DIR)/mir-gen.$(OBJSUFF) $(BUILD_DIR)/c2mir/c2mir.$(OBJSUFF)
+	$(AR) rcs $@ $^
+
+lib: $(BUILD_DIR)/libmir.$(LIBSUFF)
+
+# Executables
+$(BUILD_DIR)/c2m$(EXE): $(C2M_BUILD) $(BUILD_DIR)/libmir.$(LIBSUFF) | $(BUILD_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+c2m: $(BUILD_DIR)/c2m$(EXE)
+
+$(BUILD_DIR)/mir-bin-run$(EXE): $(MIR_RUN_BUILD) $(BUILD_DIR)/libmir.$(LIBSUFF) | $(BUILD_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+mir-run: $(BUILD_DIR)/mir-bin-run$(EXE)
+
+$(BUILD_DIR)/m2b$(EXE): $(M2B_BUILD) $(BUILD_DIR)/libmir.$(LIBSUFF) | $(BUILD_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(BUILD_DIR)/b2m$(EXE): $(B2M_BUILD) $(BUILD_DIR)/libmir.$(LIBSUFF) | $(BUILD_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(BUILD_DIR)/b2ctab$(EXE): $(B2CTAB_BUILD) $(BUILD_DIR)/libmir.$(LIBSUFF) | $(BUILD_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+# Clean
+clean:
+	rm -rf $(BUILD_DIR)
+
+# Basic test
+test: $(BUILD_DIR)/c2m$(EXE)
+	@echo "=== Testing Cosmopolitan MIR build ==="
+	$(BUILD_DIR)/c2m$(EXE) -v $(SRC_DIR)/sieve.c -ei
+	@echo "=== Test passed ==="
+
+# Install (optional, for system-wide installation)
+install: $(BUILD_DIR)/libmir.$(LIBSUFF) $(EXECUTABLES) | $(PREFIX)/include $(PREFIX)/lib $(PREFIX)/bin
+	install -m a+r $(SRC_DIR)/mir.h $(SRC_DIR)/mir-dlist.h $(SRC_DIR)/mir-varr.h $(SRC_DIR)/mir-htab.h \
+		$(SRC_DIR)/mir-gen.h $(SRC_DIR)/c2mir/c2mir.h $(PREFIX)/include
+	install -m a+r $(BUILD_DIR)/libmir.$(LIBSUFF) $(PREFIX)/lib
+	install -m a+rx $(EXECUTABLES) $(PREFIX)/bin
+
+$(PREFIX)/include $(PREFIX)/lib $(PREFIX)/bin:
+	mkdir -p $@
+
+# Uninstall
+uninstall:
+	rm -f $(PREFIX)/include/mir.h $(PREFIX)/include/mir-dlist.h $(PREFIX)/include/mir-varr.h \
+		$(PREFIX)/include/mir-htab.h $(PREFIX)/include/mir-gen.h $(PREFIX)/include/c2mir.h
+	rm -f $(PREFIX)/lib/libmir.$(LIBSUFF)
+	rm -f $(addprefix $(PREFIX)/bin/,$(notdir $(EXECUTABLES)))
