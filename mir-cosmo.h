@@ -42,7 +42,9 @@ static inline MIR_arch_t mir_get_arch(void) {
   return MIR_ARCH_PPC64;
 #elif defined(__s390x__)
   return MIR_ARCH_S390X;
-#elif defined(__riscv)
+#elif defined(__riscv) && __riscv_xlen == 64 && __riscv_flen >= 64 && \
+      __riscv_float_abi_double && __riscv_mul && __riscv_div && __riscv_compressed
+  /* Only 64-bit RISC-V with at least rv64imafdc is supported */
   return MIR_ARCH_RISCV64;
 #else
   return MIR_ARCH_UNKNOWN;
