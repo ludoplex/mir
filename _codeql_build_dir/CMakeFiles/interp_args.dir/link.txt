@@ -1,1 +1,0 @@
-/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/interp_args.dir/link.d "CMakeFiles/interp_args.dir/mir-tests/args-interp.c.o" CMakeFiles/mir.dir/mir.c.o "CMakeFiles/mir.dir/mir-gen.c.o" CMakeFiles/mir.dir/c2mir/c2mir.c.o -o interp_args  -lm

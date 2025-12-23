@@ -1,1 +1,0 @@
-/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/m2b.dir/link.d "CMakeFiles/m2b.dir/mir-utils/m2b.c.o" CMakeFiles/mir.dir/mir.c.o "CMakeFiles/mir.dir/mir-gen.c.o" CMakeFiles/mir.dir/c2mir/c2mir.c.o -o m2b  -lm

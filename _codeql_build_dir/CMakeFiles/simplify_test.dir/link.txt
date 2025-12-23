@@ -1,1 +1,0 @@
-/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/simplify_test.dir/link.d "CMakeFiles/simplify_test.dir/mir-tests/simplify.c.o" CMakeFiles/mir.dir/mir.c.o "CMakeFiles/mir.dir/mir-gen.c.o" CMakeFiles/mir.dir/c2mir/c2mir.c.o -o simplify_test  -lm

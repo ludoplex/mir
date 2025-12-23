@@ -1,1 +1,0 @@
-/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -fPIC -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/mir_shared.dir/link.d -shared -Wl,-soname,libmir_shared.so -o libmir_shared.so CMakeFiles/mir.dir/mir.c.o "CMakeFiles/mir.dir/mir-gen.c.o" CMakeFiles/mir.dir/c2mir/c2mir.c.o  -lm

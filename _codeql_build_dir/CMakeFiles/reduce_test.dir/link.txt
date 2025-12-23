@@ -1,1 +1,0 @@
-/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/reduce_test.dir/link.d "CMakeFiles/reduce_test.dir/adt-tests/mir-reduce-test.c.o" -o reduce_test

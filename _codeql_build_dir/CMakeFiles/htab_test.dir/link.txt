@@ -1,1 +1,0 @@
-/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/htab_test.dir/link.d "CMakeFiles/htab_test.dir/adt-tests/mir-htab-test.c.o" -o htab_test
