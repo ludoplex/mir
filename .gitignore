@@ -8,5 +8,7 @@
 *.so.*
 *.a
 /mir-run
+/mir-bin-run
 /build
+/build-cosmo
 /.cache
