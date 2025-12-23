@@ -1,0 +1,1 @@
+/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/bitmap_test.dir/link.d "CMakeFiles/bitmap_test.dir/adt-tests/mir-bitmap-test.c.o" -o bitmap_test

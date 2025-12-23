@@ -1,0 +1,1 @@
+/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/varr_test.dir/link.d "CMakeFiles/varr_test.dir/adt-tests/mir-varr-test.c.o" -o varr_test

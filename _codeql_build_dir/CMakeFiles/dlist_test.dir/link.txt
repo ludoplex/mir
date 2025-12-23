@@ -1,0 +1,1 @@
+/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/dlist_test.dir/link.d "CMakeFiles/dlist_test.dir/adt-tests/mir-dlist-test.c.o" -o dlist_test

@@ -3,9 +3,15 @@
    
    Cosmopolitan Libc support for MIR.
    
-   This header provides runtime architecture detection when building
+   This header provides architecture identification utilities when building
    with Cosmopolitan Libc to create fat binaries that run on multiple
    platforms and architectures (x86_64 and aarch64).
+   
+   Note: Cosmopolitan fat binaries contain separate code sections for each
+   architecture. The APE (Actually Portable Executable) loader selects the
+   correct code section at runtime. Therefore, the preprocessor macros 
+   (__x86_64__, __aarch64__, etc.) correctly identify the architecture for
+   the code section being compiled, and this code runs only on that architecture.
 */
 
 #ifndef MIR_COSMO_H
@@ -13,12 +19,7 @@
 
 #ifdef MIR_COSMO
 
-/* Cosmopolitan provides these architecture detection macros at runtime */
-#if defined(__COSMOPOLITAN__)
-#include <libc/runtime/runtime.h>
-#endif
-
-/* MIR_ARCH enum for runtime architecture selection */
+/* MIR_ARCH enum for architecture identification */
 typedef enum {
   MIR_ARCH_X86_64,
   MIR_ARCH_AARCH64,
@@ -28,7 +29,10 @@ typedef enum {
   MIR_ARCH_UNKNOWN
 } MIR_arch_t;
 
-/* Runtime architecture detection function */
+/* Get the architecture of the currently running code section.
+   In a Cosmopolitan fat binary, this returns the architecture for
+   which this code section was compiled, which is the same as the
+   architecture the binary is currently running on (due to APE loader). */
 static inline MIR_arch_t mir_get_arch(void) {
 #if defined(__x86_64__) || defined(_M_AMD64)
   return MIR_ARCH_X86_64;

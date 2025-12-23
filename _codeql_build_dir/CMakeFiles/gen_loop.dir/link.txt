@@ -1,0 +1,1 @@
+/home/runner/work/mir/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/gen_loop.dir/link.d "CMakeFiles/gen_loop.dir/mir-tests/loop-sieve-gen.c.o" CMakeFiles/mir.dir/mir.c.o "CMakeFiles/mir.dir/mir-gen.c.o" CMakeFiles/mir.dir/c2mir/c2mir.c.o -o gen_loop  -lm
